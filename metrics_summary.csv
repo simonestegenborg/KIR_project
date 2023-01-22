@@ -1,0 +1,72 @@
+Category,Library Type,Grouped By,Group Name,Metric Name,Metric Value
+Cells,Antibody Capture,,,Antibody reads usable per cell,"10,522"
+Cells,Antibody Capture,,,Cells,"6,360"
+Cells,Antibody Capture,,,Median UMI counts per cell,"2,445"
+Cells,Gene Expression,,,Cells,"6,360"
+Cells,Gene Expression,,,Confidently mapped reads in cells,93.85%
+Cells,Gene Expression,,,Median UMI counts per cell,"2,014"
+Cells,Gene Expression,,,Median genes per cell,979
+Cells,Gene Expression,,,Median reads per cell,"24,474"
+Cells,Gene Expression,,,Total genes detected,"19,110"
+Cells,VDJ T,,,Cells with productive TRA contig,59.12%
+Cells,VDJ T,,,Cells with productive TRB contig,93.93%
+Cells,VDJ T,,,"Cells with productive V-J spanning (TRA, TRB) pair",53.05%
+Cells,VDJ T,,,Cells with productive V-J spanning pair,53.05%
+Cells,VDJ T,,,Estimated number of cells,"2,686"
+Cells,VDJ T,,,Median TRA UMIs per Cell,1
+Cells,VDJ T,,,Median TRB UMIs per Cell,4
+Cells,VDJ T,,,Number of cells with productive V-J spanning pair,"1,425"
+Cells,VDJ T,,,Paired clonotype diversity,13.63
+Library,Antibody Capture,Fastq ID,EXP15_BC-AK32137-AK32138_HFK5LDSX2,Number of reads,"103,678,494"
+Library,Antibody Capture,Fastq ID,EXP15_BC-AK32137-AK32138_HFK5LDSX2,Number of short reads skipped,0
+Library,Antibody Capture,Fastq ID,EXP15_BC-AK32137-AK32138_HFK5LDSX2,Q30 RNA read,83.8%
+Library,Antibody Capture,Fastq ID,EXP15_BC-AK32137-AK32138_HFK5LDSX2,Q30 RNA read 2,91.3%
+Library,Antibody Capture,Fastq ID,EXP15_BC-AK32137-AK32138_HFK5LDSX2,Q30 UMI,94.4%
+Library,Antibody Capture,Fastq ID,EXP15_BC-AK32137-AK32138_HFK5LDSX2,Q30 barcodes,95.3%
+Library,Antibody Capture,Physical library ID,ABC_1,Estimated number of cells,"6,360"
+Library,Antibody Capture,Physical library ID,ABC_1,Fraction antibody reads,96.62%
+Library,Antibody Capture,Physical library ID,ABC_1,Fraction antibody reads in aggregate barcodes,0.17%
+Library,Antibody Capture,Physical library ID,ABC_1,Fraction antibody reads usable,64.55%
+Library,Antibody Capture,Physical library ID,ABC_1,Fraction reads in cells,68.09%
+Library,Antibody Capture,Physical library ID,ABC_1,Fraction unrecognized antibody,3.38%
+Library,Antibody Capture,Physical library ID,ABC_1,Mean reads per cell,"16,302"
+Library,Antibody Capture,Physical library ID,ABC_1,Number of reads,"103,678,494"
+Library,Antibody Capture,Physical library ID,ABC_1,Sequencing saturation,63.97%
+Library,Antibody Capture,Physical library ID,ABC_1,Valid UMIs,99.99%
+Library,Antibody Capture,Physical library ID,ABC_1,Valid barcodes,98.34%
+Library,Gene Expression,Fastq ID,EXP15_GENE-SCI7T009-SCI5T009_HFK5LDSX2,Number of reads,"187,924,705"
+Library,Gene Expression,Fastq ID,EXP15_GENE-SCI7T009-SCI5T009_HFK5LDSX2,Number of short reads skipped,0
+Library,Gene Expression,Fastq ID,EXP15_GENE-SCI7T009-SCI5T009_HFK5LDSX2,Q30 RNA read,90.4%
+Library,Gene Expression,Fastq ID,EXP15_GENE-SCI7T009-SCI5T009_HFK5LDSX2,Q30 RNA read 2,90.0%
+Library,Gene Expression,Fastq ID,EXP15_GENE-SCI7T009-SCI5T009_HFK5LDSX2,Q30 UMI,94.9%
+Library,Gene Expression,Fastq ID,EXP15_GENE-SCI7T009-SCI5T009_HFK5LDSX2,Q30 barcodes,95.5%
+Library,Gene Expression,Physical library ID,GEX_1,Confidently mapped antisense,8.00%
+Library,Gene Expression,Physical library ID,GEX_1,Confidently mapped reads in cells,93.85%
+Library,Gene Expression,Physical library ID,GEX_1,Confidently mapped to exonic regions,76.03%
+Library,Gene Expression,Physical library ID,GEX_1,Confidently mapped to genome,85.98%
+Library,Gene Expression,Physical library ID,GEX_1,Confidently mapped to intergenic regions,4.06%
+Library,Gene Expression,Physical library ID,GEX_1,Confidently mapped to intronic regions,5.89%
+Library,Gene Expression,Physical library ID,GEX_1,Confidently mapped to transcriptome,72.92%
+Library,Gene Expression,Physical library ID,GEX_1,Estimated number of cells,"6,360"
+Library,Gene Expression,Physical library ID,GEX_1,Mapped to genome,90.80%
+Library,Gene Expression,Physical library ID,GEX_1,Mean reads per cell,"29,548"
+Library,Gene Expression,Physical library ID,GEX_1,Number of reads,"187,924,705"
+Library,Gene Expression,Physical library ID,GEX_1,Number of reads in the library,"187,924,705"
+Library,Gene Expression,Physical library ID,GEX_1,Sequencing saturation,89.63%
+Library,Gene Expression,Physical library ID,GEX_1,Valid UMIs,99.52%
+Library,Gene Expression,Physical library ID,GEX_1,Valid barcodes,93.28%
+Library,VDJ T,Fastq ID,EXP15_TCR-SCI7T008-SCI5T008_HFK5LDSX2,Number of reads,"21,187,962"
+Library,VDJ T,Fastq ID,EXP15_TCR-SCI7T008-SCI5T008_HFK5LDSX2,Number of short reads skipped,0
+Library,VDJ T,Fastq ID,EXP15_TCR-SCI7T008-SCI5T008_HFK5LDSX2,Q30 RNA read,92.4%
+Library,VDJ T,Fastq ID,EXP15_TCR-SCI7T008-SCI5T008_HFK5LDSX2,Q30 RNA read 2,92.9%
+Library,VDJ T,Fastq ID,EXP15_TCR-SCI7T008-SCI5T008_HFK5LDSX2,Q30 UMI,94.9%
+Library,VDJ T,Fastq ID,EXP15_TCR-SCI7T008-SCI5T008_HFK5LDSX2,Q30 barcodes,95.4%
+Library,VDJ T,Physical library ID,VDJT_1,Estimated number of cells,"2,686"
+Library,VDJ T,Physical library ID,VDJT_1,Fraction reads in cells,59.08%
+Library,VDJ T,Physical library ID,VDJT_1,Mean reads per cell,"7,888"
+Library,VDJ T,Physical library ID,VDJT_1,Mean used reads per cell,"4,008"
+Library,VDJ T,Physical library ID,VDJT_1,Number of reads,"21,187,962"
+Library,VDJ T,Physical library ID,VDJT_1,Reads mapped to TRA,13.36%
+Library,VDJ T,Physical library ID,VDJT_1,Reads mapped to TRB,61.34%
+Library,VDJ T,Physical library ID,VDJT_1,Reads mapped to any V(D)J gene,74.81%
+Library,VDJ T,Physical library ID,VDJT_1,Valid barcodes,93.95%

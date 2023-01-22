@@ -1,0 +1,17 @@
+[gene-expression],,
+reference,/services/tools/cellranger/refdata/refdata-cellranger-GRCh38-1.2.0,
+,,
+,,
+[feature],,
+reference,/Volumes/T-cells-and-cancer/SRH group/Group members/Simone/data/features.csv,
+,,
+,,
+[vdj],,
+reference,/reference-to-VDJ/refdata-cellranger-vdj-GRCh38-alts-ensembl-5.0.0,
+,,
+,,
+[libraries],,
+fastq_id,fastqs,feature_types
+gex,/home/projects/SRHgroup/projects/SingleCell_KIR/........,Gene Expression
+adt,/home/projects/SRHgroup/projects/SingleCell_KIR/........,Antibody Capture
+vdj,/home/projects/SRHgroup/projects/SingleCell_KIR/........,VDJ-T
