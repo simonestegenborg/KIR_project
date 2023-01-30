@@ -46,7 +46,6 @@ sample <- as.matrix(GetAssayData(object = KIR[["ADT"]], slot = "counts"))[sample
 #create assay object 
 KIR[["HTO"]] <- CreateAssayObject(counts = sample)
 
-
 # Normalize and demultiplex
 KIR <- KIR %>% 
   NormalizeData(assay = "HTO", normalization.method = "CLR") %>%
@@ -57,12 +56,12 @@ KIR <- KIR %>%
 table(KIR$HTO_classification.global)
 table(KIR$HTO_classification)
 
-
 #group cells based on the max HTO signal
 Idents(KIR) <- "HTO_maxID"
 RidgePlot(KIR, assay = "HTO", features = c("S1", "S2", "S3", "S4","S5","S6","S7","S8","S9","S10"))
+#FeatureScatter(KIR, feature1 = "S1", feature2 = "S3")
 
-# HTO Heatmap
+# HTO heatmap
 KIR$HTO_classification2 <- KIR$HTO_classification
 KIR$HTO_classification2[grepl("_", KIR$HTO_classification2)] <- "Multiplet"
 
@@ -78,7 +77,7 @@ KIR %>% subset(HTO_classification2 != "Negative") %>%
   guides(color='none') 
 
 
-#Violingplot that compare number of UMIs for singlets, doublets and negative cells
+#Violin plot that compare number of UMIs for singlets, doublets and negative cells
 Idents(KIR) <- "HTO_classification.global"
 VlnPlot(KIR, features = "nCount_RNA", pt.size = 0.1, log = TRUE)
 
@@ -107,6 +106,7 @@ rowSums(BC_raw)
 BC <- BC_raw[-c(8,9,10,11,12,14,15),]
 BC <- BC[, colSums(BC) > 0]
 
+
 # check barcode sums
 rowSums(BC)
 
@@ -128,11 +128,10 @@ table(demux_data$Barcodes_classification)
 # Add information as metadata
 KIR <- AddMetaData(KIR, demux_data$Barcodes_classification, col.name = 'barcode')
 
-# Add barcode matrix as assay
-# Create Barcode assay ?
+# Create Barcode assay 
 KIR[["Barcodes"]] <-  CreateAssayObject(counts = BC_raw)
 
-# same as above - table from demux_data which is now in KIR object
+# Same as above - table from demux_data which is now in KIR object
 table(KIR$barcode)
 
 # Remove barcode and hashing rows from ADT data
@@ -145,7 +144,7 @@ phenotype <- as.matrix(GetAssayData(object = KIR[["ADT"]], slot = "counts"))[phe
 KIR[["ADT"]] <- CreateAssayObject(counts = phenotype)
 
 # Create an object of KIR without doublets:
-KIR.subset <- KIR %>% subset(HTO_classification.global == "Singlet") #Now we have 4655 instead of 6360 GEMs
+KIR.subset <- KIR %>% subset(HTO_classification.global == "Singlet")
 
 # Add conditions for each sample as metadata:
 KIR.subset$condition <- recode(KIR.subset$HTO_classification,
@@ -184,8 +183,7 @@ ggVennDiagram(list_venn, label_alpha = 0, label = "percent") +
   scale_fill_gradient(low="lightskyblue",high = "yellow")
 
 #counts
-venn(list_venn, ilab=TRUE, zcolor = "style")
-
+venn(list_venn, ilab=TRUE, ilcs = 1, sncs = 1  ,zcolor = "style", ggplot = TRUE) 
 
 
 ############################### pMHC Barcode filtering ####################################
@@ -212,7 +210,6 @@ KIR.subset$barcode[(KIR.subset$HTO_classification == "S9") &
 KIR.subset$barcode[(KIR.subset$HTO_classification == "S9") & 
                      (KIR.subset$barcode=="BC14_BC5") &
                      (!is.na(KIR.subset$barcode))] <-"BC14"
-
 
 # Make barcode count plot
 KIR.subset@meta.data %>% 
@@ -247,28 +244,27 @@ VlnPlot(KIR.subset, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), nc
 # FeatureScatter plots of QC metrics
 plot1 <- FeatureScatter(KIR.subset, feature1 = "nCount_RNA", feature2 = "percent.mt") +
   xlab("RNA count") + ylab("Percentage mitochondrial genes")
-                              
+                             
 plot2 <- FeatureScatter(KIR.subset, feature1 = "nCount_RNA", feature2 = "nFeature_RNA") + 
-  geom_smooth(method = "lm") 
+  geom_smooth(method = "lm") +
   xlab("RNA count") + ylab("Gene count")
-                              
-plot1 + plot2
+                             
+plot1 + plot
 
 
 
 # 2)  Filtering out low quality cells ------------------------------------------------------------
 # we filter out cells that have unique feature counts over 2,500 or less than 200
 # we filter out cells that have more than 5% mitochondrial counts
-KIR.subset <-  subset(KIR.subset, subset = nFeature_RNA > 200 & nFeature_RNA < 2500 & percent.mt < 5) 
+KIR.subset <-  subset(KIR.subset, subset = nFeature_RNA > 200 & nFeature_RNA < 2500 & percent.mt < 5)
 KIR.subset #4143 instead of 4655 
 
 
 # 3)  Normalizing the data -------------------------------------------------------------------------
 # lognormalized and multiplied by 10000, these are default
-KIR.subset <- NormalizeData(KIR.subset, normalization.method = "LogNormalize", scale.factor = 10000)
+KIR.subset <- NormalizeData(KIR.subset, normalization.method = "LogNormalize", scale.factor = 10000) 
 
-
-# Remove non-coding genes from KIR.subset object
+# Remove non-coding genes from KIR.subset
 genes <- c(KIR@assays[["RNA"]]@data@Dimnames[[1]])
 require(biomaRt)
 mart <- useMart("ENSEMBL_MART_ENSEMBL", host = "https://useast.ensembl.org")
@@ -361,7 +357,6 @@ DimPlot(KIR.subset, reduction = "umap", label = T, group.by = "RNA_snn_res.0.5",
 # UMAP by sample
 DimPlot(KIR.subset, group.by = "hash.ID", label = F) + 
   ggtitle('All samples', subtitle = "coloured based on series") + 
-  facet_grid("hash.ID")
   theme(plot.title = element_text(hjust = 0,size = 15),
         plot.subtitle = element_text(hjust = 0, size = 15))
 
@@ -379,14 +374,14 @@ DimPlot(KIR.subset, group.by = "barcode", label = F) +
 
 
 
-# 8) Differential expression analysis (find biomarkers) -----------------------------------------
+# 8) Differential expression analysis (cluster biomarkers)
 DefaultAssay(KIR.subset) <- "RNA"
-Idents(KIR.subset) <- KIR.subset$condition
+Idents(KIR.subset) <- KIR.subset$condition 
 
 # Find markers for every condition compared to all remaining cells, report only the positive ones
 KIR.markers.subset <- FindAllMarkers(KIR.subset, only.pos = FALSE, min.pct = 0.25, logfc.threshold = 0.25)
 
-# Find markerrs for conditions compared to other specific conditions
+# Find markers for conditions compared to other specific conditions
 # 1) KIR+_MM+ vs TCR specific
 # 2) MM+ vs KIR+_MM+
 # 3) TCR specific vs KIR+_MM+, MM+, control
@@ -412,7 +407,7 @@ KIR.markers3.subset <- KIR.markers3.subset %>%
 KIR.markers1.subset <- KIR.markers1.subset %>% 
   filter(!str_detect(row.names(KIR.markers1.subset), "RP11-277P12.6"))
 
-# Gene expression shown for each condition for top 10 significant genes orderd by log2FC:
+# Gene expression shown for each condition for top 10 significant genes ordered by log2FC:
 feature.list1 <- KIR.markers1.subset %>% 
   filter(p_val_adj < .05) %>%
   slice_max(n = 5, order_by=avg_log2FC) %>%
@@ -428,6 +423,8 @@ feature.list3 <- KIR.markers3.subset %>%
   slice_max(n = 5, order_by=avg_log2FC) %>%
   row.names()
 
+feature.list11 <- c("GNLY", 'KLRC2',  "TYROBP", "KIR2DL1", "KIR3DL1", "DEK", "TXNIP", "B2M", "HLA-C")
+
 # Create heatmap showing gene expressions 
 KIR.subset$condition <- factor(KIR.subset$condition, levels = c('KIR+_MM+','control', 'MM+', 'TCR_specific'))
 DoHeatmap(KIR.subset, group.by = 'condition', slot = 'scale.data',
@@ -441,15 +438,70 @@ KIR.markers.subset %>%
   group_by(cluster) %>%
   slice_max(n = 5, order_by = avg_log2FC) 
 
+
 # Visualizes feature expression on a tSNE or PCA plot
 DefaultAssay(KIR.subset) = "RNA"
+FeaturePlot(KIR.subset, features = c("CD3G", "CD3E","FOS","JUN"))
 FeaturePlot(KIR.subset, features = c("KIR3DL1", "KIR2DL1", "XCL2", "GNLY"))
-
 Idents(KIR.subset) <- KIR.subset$buffy_coat
 FeaturePlot(KIR.subset, features = c("KIR3DL1", "KIR2DL1"), split.by = "condition", label = T)
 
-# GD T cells test
+Idents(KIR.subset) <- KIR.subset$condition
+VlnPlot(KIR.subset, features = c("KIR3DL1", "KIR2DL1"), split.by = 'condition')
+
+# GD T cells?
 FeaturePlot(KIR.subset, c('TRDC', "TRDV1")) 
+
+
+###################################### Complex Heatmap ######################################
+max <- KIR.subset@assays$RNA@scale.data[c(feature.list11, feature.list2, 'TCF7', feature.list3),]
+cells <- Cells(KIR.subset)[order(KIR.subset$condition)]
+
+library(randomcoloR)
+library(circlize)
+library(ComplexHeatmap)
+
+cols_hm <- recode(KIR.subset$condition[cells],
+                  KIR_staining='red', control='green', 
+                  `MM+`='blue', TCR_specific='purple')
+names(cols_hm) <- KIR.subset$condition[cells]
+
+gex_hm <- HeatmapAnnotation(condition = KIR.subset$condition[cells],
+                            col = list(condition=cols_hm),
+                            which = 'col',
+                            annotation_width = unit(c(1, 4), 'cm'),
+                            gap = unit(1, 'mm'))
+
+hm_breaks = c(-1, 0, 1)
+hm_palette=c("blue", "black", "red")
+col_fun = colorRamp2(hm_breaks, hm_palette)
+
+gex_hmap <- Heatmap(
+  as.matrix(max[,cells]),
+  column_order = colnames(max[,cells]),
+  show_row_names = T, col = col_fun,
+  show_column_names = FALSE,
+  cluster_rows = F, column_split = KIR.subset$condition[order(KIR.subset$condition)],
+  row_names_gp = grid::gpar(fontsize = 8),  column_title_gp = gpar(fontsize = 10), 
+  cluster_columns = F,
+  top_annotation=gex_hm)
+gex_hmap
+
+adtmax <- KIR.subset@assays$ADT@scale.data[c('CD57', ADT.feature.list1, ADT.feature.list2,ADT.feature.list3),]
+
+hm_breaks = c(-1.5, 0, 1.5)
+hm_palette=c("blue", "black", "red")
+col_fun = colorRamp2(hm_breaks, hm_palette)
+adt_hmap <- Heatmap(
+  as.matrix(adtmax[,cells]),
+  column_order = colnames(adtmax[,cells]),
+  show_row_names = T, col = col_fun,
+  show_column_names = FALSE,
+  cluster_rows = F, column_split = KIR.subset$condition[order(KIR.subset$condition)],
+  row_names_gp = grid::gpar(fontsize = 8),  column_title_gp = gpar(fontsize = 10), 
+  cluster_columns = F,
+  top_annotation=gex_hm)
+adt_hmap
 
 
 
@@ -501,8 +553,6 @@ DoHeatmap(KIR.subset, assay = "ADT", group.by = 'condition',
   theme(text = element_text(size = 15, vjust = 0.5)) +   
   guides(color='none')
 
-
-
 ############################ Clonotype Analysis #############################3
 # Clonotype plot with barcodes as fill
 KIR.subset$hash.ID <- factor(KIR.subset$hash.ID, levels=c("S1","S2","S3","S4","S5","S6","S7","S8","S9","S10"))
@@ -533,7 +583,7 @@ ggplot(f, aes(x = clonotype, y = ID)) +
 
 # Investigation of top 10 clonotypes -----------------------------------------------------------
 
-# Top 10 clones for stacked barplots:
+# Top 10 clones for stacked barplot
 #Buffy coat 357
 top10_b_BC357 <- KIR.subset@meta.data %>% subset(buffy_coat == "BC357")
 top10_b_BC357 <- sort(table(top10_b_BC357$TRB_clone), decreasing = T)[1:10]
@@ -563,7 +613,6 @@ KIR.subset@meta.data <- KIR.subset@meta.data %>%
   mutate(TRB_clone = as.character(TRB_clone)) %>%
   left_join(topb_clones_BC351, by= "TRB_clone")
 rownames(KIR.subset@meta.data) <- Cells(KIR.subset) 
-
 
 # UMAP showing the clones:
 DimPlot(KIR.subset, label = T, label.size = 3, group.by = "topb_clones", cols=c("#00B0F6" ,"#FF62BC", "#00BF7D", "#00BFC4", "#39B600", "#D89000", "#F8766D","#9590FF", "#A3A500" ,"#E76BF3"), na.value = "grey90")
@@ -612,8 +661,8 @@ df_clonotype_BC351 <- filter(df_clonotype_BC351, TRB_clone %in% names(top10_b_BC
 df_clonotype_BC357 <- filter(df_clonotype_BC357, TRB_clone %in% names(top10_b_BC357) )
 
 df_clonotype_BC357$hash.ID <- factor(df_clonotype_BC357$hash.ID, 
-                      levels = c("S1","S2","S3","S4","S5",
-                                 "S6","S7","S8","S9","S10"))
+                                     levels = c("S1","S2","S3","S4","S5",
+                                                "S6","S7","S8","S9","S10"))
 
 # Create plots with point size and colour relfecting counts 
 ggplot(df_clonotype_BC351, aes(x = clonotype, y = hash.ID)) +
@@ -621,50 +670,24 @@ ggplot(df_clonotype_BC351, aes(x = clonotype, y = hash.ID)) +
   scale_y_discrete(limits=rev) +
   scale_size_area(max_size = 10, breaks=c(1,2,3,4,5,6,7)) + 
   scale_color_viridis(option = "D", begin = 0, end = .75, 
-                      breaks = c(11,2,3,4,5,6,7), labels = c(1,2,3,4,5,6,7)) + 
+                      breaks = c(1,2,3,4,5,6,7), labels = c(1,2,3,4,5,6,7)) + 
   theme_minimal() + 
-  theme(text = element_text(size=20), strip.background = element_blank(),
-        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1, size = 15)) + 
+  theme(text = element_text(size=15), strip.background = element_blank(),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1, size = 7)) + 
   labs(x="beta clone ID",y="",size='GEMs',color='GEMs') +
   ggtitle("Buffycoat 351")
 
 ggplot(df_clonotype_BC357, aes(x = clonotype, y = hash.ID)) +
   geom_count(aes(color = ..n.., size = ..n..), alpha=0.8) + 
   scale_y_discrete(limits=rev) +
-  scale_size_area(max_size = 10, breaks=c(1,10,50,100,150,200,250,300,350,400)) + 
+  scale_size_area(max_size = 20, breaks=c(1,10,50,100,150,200,250,300,350,400)) + 
   scale_color_viridis(option = "D", begin = 0, end = .75, 
                       breaks = c(1,10,50,100,150,200,250,300,350,400), labels = c(1,10,50,100,150,200,250,300,350,400)) + 
   theme_minimal() + 
   theme(text = element_text(size=25), strip.background = element_blank(),
-        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1, size = 15)) + 
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1, size = 9)) + 
   labs(x="beta clone ID",y="",size='GEMs',color='GEMs') +
   ggtitle("Buffycoat 357")
-
-
-# Create a similar plot with percentage as size instead:
-df_clonotype_percent <- df_clonotype_BC351%>%
-  group_by(hash.ID, clonotype) %>% mutate(GEM_count=n()) %>%
-  ungroup() %>% mutate(GEM_sum=sum(GEM_count)) %>%
-  mutate(percent=(GEM_count/GEM_sum)*100) #%>%
-
-ggplot(df_clonotype_percent,
-             aes(x = clonotype, y = hash.ID, size=percent, color=percent)) +
-  geom_point(alpha=0.8) +
-  scale_y_discrete(limits=rev) +
-  scale_size_area(max_size = 25, breaks=c(0.1,1, 5, 10,20,30)) +
-  scale_color_viridis(option = "D", begin = 0, end = .75, direction = -1,
-                      breaks = c(10,20,30,40), labels = c(10,20,30,40)) +
-  theme_bw() +
-  theme(text = element_text(size=20), strip.background = element_blank()) +
-  theme(legend.key.size = unit(.5, 'cm'), #change legend key size
-        legend.key.height = unit(.5, 'cm'), #change legend key height
-        legend.key.width = unit(.5, 'cm'), #change legend key width
-        legend.title = element_text(size=10), #change legend title font size
-        legend.text = element_text(size=10)) +#change legend text font size
-  labs(x="clonotype ID",y="",size='percent',color='percent') +
-  ggtitle("Buffy coat 351") +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
-
 
 
 # Sankey plots -----------------------------------------------------------
@@ -698,8 +721,9 @@ write.csv(sankey_df,"/Volumes/T-cells-and-cancer/SRH group/Group members/Simone/
 
 
 
+
 ############################ Doublets coming from hashing-antibodies #############################
-# Find the most frequent hashing-antibody in thee doublets 
+# Find the most frequent sample in doublets 
 KIR$HTO_classification[KIR$HTO_classification.global == "Doublet"]
 
 a <- separate(as_tibble(KIR$HTO_classification[KIR$HTO_classification.global == "Doublet"]), value , c("N1","N2"), sep="_")
@@ -726,64 +750,144 @@ ggplot(data=d, aes(x=N1, y=freq)) +
 
 
 
-############################ Gene Enrichment Analysis #############################
-Idents(KIR.subset) <- KIR.subset$condition
 
+############################ Gene Enrichment Analysis #############################
 # Keep only the significant genes and divide into conditions
 # Use already found marker genes within each comparison:
 # 1) KIR+_MM+ vs TCR specific
 # 2) MM+ vs KIR+_MM+
 # 3) TCR specific vs KIR+_MM+, MM+, control
+
+Idents(KIR.subset) <- KIR.subset$condition
+KIR.markers.subset <- FindAllMarkers(KIR.subset, only.pos = FALSE, min.pct = 0.25, logfc.threshold = 0.25) %>%
+  mutate(p_val_adj = p.adjust(p_val, method = 'BH'))
+
+KIR.markers1.subset <- FindMarkers(KIR.subset, 
+                                   ident.1 = "KIR+_MM+", ident.2 = "TCR_specific", 
+                                   only.pos = FALSE, min.pct = 0.25, logfc.threshold = 0.25) %>%
+  mutate(p_val_adj = p.adjust(p_val, method = 'BH'))
+KIR.markers2.subset <- FindMarkers(KIR.subset, ident.1 = "MM+", ident.2 = "KIR+_MM+", only.pos = FALSE, min.pct = 0.25, logfc.threshold = 0.25)  %>%
+  mutate(p_val_adj = p.adjust(p_val, method = 'BH'))
+KIR.markers3.subset <- FindMarkers(KIR.subset, ident.1 = "TCR_specific", ident.2 = c("KIR+_MM+","MM+","control") ,only.pos = FALSE, min.pct = 0.25, logfc.threshold = 0.25) %>%
+  mutate(p_val_adj = p.adjust(p_val, method = 'BH'))
+
+##############################################
+
+KIR.markers1.subset$cluster <- 'KIRs_vs_TCR'
+KIR.markers1.subset$gene <- rownames(KIR.markers1.subset)
+KIR.markers2.subset$cluster <- 'KIRm_vs_KIRs'
+KIR.markers2.subset$gene <- rownames(KIR.markers2.subset)
+KIR.markers3.subset$cluster <- 'TCR_vs_KIRs_KIRm_cntrl'
+KIR.markers3.subset$gene <- rownames(KIR.markers3.subset)
+
+KIR.go <- bind_rows(KIR.markers1.subset, KIR.markers2.subset, KIR.markers3.subset)
+KIR.go$gene
+
+KIR.go <- KIR.go %>%
+  filter(p_val_adj < .05) %>%
+  filter(avg_log2FC > 0) 
+
+# Keep only the significant genes and divide into conditions
+markers_sig <- subset(KIR.markers.subset, p_val_adj < 0.05)
 markers_sig1 <- subset(KIR.markers1.subset, p_val_adj < 0.05)
 markers_sig2 <- subset(KIR.markers2.subset, p_val_adj < 0.05)
 markers_sig3 <- subset(KIR.markers3.subset, p_val_adj < 0.05)
 
-markers1_KIR <- markers_sig1 %>% filter(str_detect(cluster, "KIR+_MM+"))
+markers_KIR_staining <- markers_sig %>% filter(str_detect(cluster, "KIR+_MM+"))
+markers_TCR_specific <- markers_sig %>% filter(str_detect(cluster, "TCR_specific"))
+markers_control <- markers_sig %>% filter(str_detect(cluster, "control"))
+markers_MM <- markers_sig %>% filter(str_detect(cluster, "MM+"))
+
+markers1_KIR_staining <- markers_sig1 %>% filter(str_detect(cluster, "KIR+_MM+"))
 markers1_TCR_specific <- markers_sig1 %>% filter(str_detect(cluster, "TCR_specific"))
 markers1_control <- markers_sig1 %>% filter(str_detect(cluster, "control"))
 markers1_MM <- markers_sig1 %>% filter(str_detect(cluster, "MM+"))
 
-markers2_KIR <- markers_sig2 %>% filter(str_detect(cluster, "KIR+_MM+"))
+markers2_KIR_staining <- markers_sig2 %>% filter(str_detect(cluster, "KIR+_MM+"))
 markers2_TCR_specific <- markers_sig2 %>% filter(str_detect(cluster, "TCR_specific"))
 markers2_control <- markers_sig2 %>% filter(str_detect(cluster, "control"))
 markers2_MM <- markers_sig2 %>% filter(str_detect(cluster, "MM+"))
 
-markers3_KIR<- markers_sig3 %>% filter(str_detect(cluster, "KIR+_MM+"))
+markers3_KIR_staining <- markers_sig3 %>% filter(str_detect(cluster, "KIR+_MM+"))
 markers3_TCR_specific <- markers_sig3 %>% filter(str_detect(cluster, "TCR_specific"))
 markers3_control <- markers_sig3 %>% filter(str_detect(cluster, "control"))
-markers3_MM<- markers_sig3 %>% filter(str_detect(cluster, "MM+"))
+markers3_MM <- markers_sig3 %>% filter(str_detect(cluster, "MM+"))
 
 # Get the significant up-regulated genes
 up <- subset(markers_sig, avg_log2FC > 0)
-up_KIR <- subset(markers_KIR, avg_log2FC > 0)
+up_KIR_staining <- subset(markers_KIR_staining, avg_log2FC > 0)
 up_TCR_specific <- subset(markers_TCR_specific, avg_log2FC > 0)
 up_control <- subset(markers_control, avg_log2FC > 0)
 up_MM <- subset(markers_MM, avg_log2FC > 0)
 
+# Get the significant down-regulated genes
+down <- subset(markers_sig, avg_log2FC < 0)
+down_KIR_staining <- subset(markers_KIR_staining, avg_log2FC < 0)
+down_TCR_specific <- subset(markers_TCR_specific, avg_log2FC < 0)
+down_control <- subset(markers_control, avg_log2FC < 0)
+down_MM <- subset(markers_MM, avg_log2FC < 0)
+
 
 # Multi analysis
-multi_gp_KIR <- gost(list("up-regulated - KIR and multimer positive" = row.names(up_KIR),
-                     sources = c("GO:MF", "GO:BP", "GO:CC", "KEGG","REAC", "HPA")))
-plot_KIR <- gostplot(multi_gp_KIR, interactive = T)
-plot_KIR
+library(gprofiler2)
+library(GOfuncR)
 
+overlap_go <- function(term, gene_list){
+  print(term)
+  tryCatch(
+    {
+      term_genes <- get_anno_genes(term, database = 'Homo.sapiens', genes = NULL, annotations = NULL,
+                                   term_df = NULL, graph_path_df = NULL, godir = NULL)
+      return(paste(intersect(term_genes$gene, gene_list), collapse = '|'))
+    }, 
+    error=function(e){
+      return(NA)
+    }
+  )
+}
 
-multi_gp_TCR_specific <- gost(list("up-regulated - TCR_specific" = row.names(up_TCR_specific),
-                      sources = c("GO:MF", "GO:BP", "GO:CC", "KEGG","REAC", "HPA")))
-plot_TCR_specific<- gostplot(multi_gp_TCR_specific, interactive = T)
+KIRs_genes <- KIR.go %>% filter(cluster == 'KIRs_vs_TCR') %>% pull(gene)
+multi_gp_KIR_staining <- gost(KIRs_genes, 
+                     sources = c("GO:MF", "GO:BP", "GO:CC", "KEGG","REAC", "HPA")) 
+multi_gp_KIR_staining$result=multi_gp_KIR_staining$result %>%
+  mutate(overlaping_genes = sapply(term_id, overlap_go, gene_list=KIRs_genes))
+
+plot_KIR_staining <- gostplot(multi_gp_KIR_staining, interactive = F)
+plot_KIR_staining <- plot_KIR_staining + ylim(-1, 8)
+highl_terms_KIRs <- multi_gp_KIR_staining$result$term_id[
+  grepl('cytotoxicity|killing|response|MHC|Natural|Antigen|Interferon|Lympho',multi_gp_KIR_staining$result$term_name)]
+
+publish_gostplot(plot_KIR_staining, highlight_terms = highl_terms_KIRs)
+
+tcrdown <- FindMarkers(KIR.subset, ident.1 = c('KIR+_MM+', 'control', 'MM+'), ident.2 = 'TCR_specific')
+tcrdown$p_val_adj <- p.adjust(tcrdown$p_val, method = 'BH')
+
+multi_gp_TCR_specificd <- gost(rownames(tcrdown)[tcrdown$p_val_adj < 0.05],
+                      sources = c("GO:MF", "GO:BP", "GO:CC", "KEGG","REAC", "HPA"))
+multi_gp_TCR_specificd$result=multi_gp_TCR_specificd$result %>%
+  mutate(overlaping_genes = sapply(term_id, overlap_go, gene_list=rownames(tcrdown)[tcrdown$p_val_adj < 0.05]))
+
+highl_terms_KIRs <- multi_gp_TCR_specificd$result$term_id[
+  grepl('cytokine|Antigen|',multi_gp_TCR_specificd$result$term_name)]
+
+plot_TCR_specific<- gostplot(multi_gp_TCR_specificd, interactive = T)
 plot_TCR_specific
 
 
-multi_gp_control <- gost(list("up-regulated - control" = row.names(up_control),
-                      sources = c("GO:MF", "GO:BP", "GO:CC", "KEGG","REAC", "HPA")))
-plot_control<- gostplot(multi_gp_control, interactive = T)
-plot_control
+multi_gp_MM <- gost(KIR.go %>% filter(cluster == 'KIRm_vs_KIRs') %>% pull(gene),
+                      sources = c("GO:MF", "GO:BP", "GO:CC", "KEGG","REAC", "HPA"))
+highl_terms_KIRm <- multi_gp_MM$result$term_id[
+  grepl('death|apopt|stress|IL-17|NF-kappa', multi_gp_MM$result$term_name)]
+
+multi_gp_MM$result=multi_gp_MM$result %>%
+  mutate(overlaping_genes = sapply(term_id, overlap_go, gene_list=KIRs_genes))
 
 
-multi_gp_MM <- gost(list("up-regulated - Multimer positive" = row.names(up_MM),
-                      sources = c("GO:MF", "GO:BP", "GO:CC", "KEGG","REAC", "HPA")))
-plot_MM<- gostplot(multi_gp_MM, interactive = T)
-plot_MM
+plot_MM <- gostplot(multi_gp_MM, interactive = F)
+plot_MM <- plot_MM + ylim(-1, 8)
+
+publish_gostplot(plot_MM, highlight_terms = highl_terms_KIRm)
+
 
 
 ################################ Barcode threshold checks ########################################
@@ -809,8 +913,9 @@ qplot(mat['BC6',], mat['BC7',], color=barcodes) +
   scale_color_manual(values=sample(col_vector, n)) +
   xlab("BC6") + ylab("BC7")+
   theme_bw() 
-
+  
 
 
 #-----------------------------------------------------------------------------------------------------
 save.image('/Users/simone/Desktop/KIR_Simone.RData')
+
