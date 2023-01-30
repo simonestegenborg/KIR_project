@@ -68,8 +68,8 @@ condition_clone_bar_BC357 <- KIR.subset@meta.data %>%
   geom_bar(stat="identity") +
   labs(x="beta clone ID",y="",size='GEMs',color='GEMs') +
   theme_minimal()+
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=0.5)) +
-  labs(y="Condition") 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=0.5,size=12)) #+
+  #labs(y="Condition") 
 
 
 barcode_clone_bar_BC357 <- KIR.subset@meta.data %>% 
@@ -83,8 +83,8 @@ barcode_clone_bar_BC357 <- KIR.subset@meta.data %>%
   scale_fill_manual(values=brewer.pal(n = 12, name = "Paired")) +
   geom_bar(stat="identity") +
   theme_minimal()+
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=0.5)) +
-  labs(y="Barcode") 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=0.5,size=12)) +
+  labs(y="Counts") 
 
 
 hash_clone_bar_BC357 <- KIR.subset@meta.data %>% 
@@ -97,11 +97,11 @@ hash_clone_bar_BC357 <- KIR.subset@meta.data %>%
   scale_fill_manual(values=brewer.pal(n = 5, name = "Set2"))+
   geom_bar(stat="identity") +
   theme_minimal()+
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=0.5)) +
-  labs(y="Hashing") 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=0.5, size=12)) +
+  labs(y=" ") 
 
 OverviewPlot_BC357 <- cowplot::plot_grid(condition_clone_bar_BC357 + NoLegend() + NoXaxis() + AdjThemeY(label_size=10),
-                                   barcode_clone_bar_BC357 + NoLegend() + NoXaxis() + AdjThemeY(label_size=10),
+                                   barcode_clone_bar_BC357 + NoLegend() + NoXaxis() + AdjThemeY(label_size=15),
                                    hash_clone_bar_BC357 + NoLegend() + AdjThemeY(label_size=10),
                                    align = "v", ncol = 1, rel_heights = c(.2, .2, .3), rel_widths = c(1, 1))
 OverviewPlot_BC357
@@ -187,6 +187,7 @@ legends_mutbar_BC351
 
 OverviewPlot_BC351 <- cowplot::plot_grid(OverviewPlot_BC351, legends_mutbar_BC351, align = "v", ncol = 1, rel_heights = c(.85, .15), rel_widths = c(1, 1))
 OverviewPlot_BC351
+
 
 
 
